@@ -1,7 +1,7 @@
 # ssid-resolver-android - "Get my Wifi Name"
 
 A standalone app to resolve the SSID of the connected WiFi network in Android, or simply: "Get my Wifi Name". This implementation uses the
-latest Android APIs as of January 2025.
+latest Android APIs as of January 2026.
 
 This code was created to be wrapped as a Flutter plugin, which you can find here: https://github.com/raoulsson/ssid_resolver_flutter
 
