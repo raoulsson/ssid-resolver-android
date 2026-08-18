@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "ssid-resolver-android"
 include(":app")
+
  
