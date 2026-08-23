@@ -5,29 +5,17 @@ latest Android APIs as of January 2026.
 
 
 > [!IMPORTANT]
-> **Version 2.0 - it can now read the netmask, which Android gives you and most code throws away.**
+> **2.0 - the delta: it can read the real netmask, so a broadcast address is derived rather than
+> guessed.**
 >
-> `NetworkInterfaceResolver` lists every IPv4 interface with its **real netmask** and the broadcast
-> address derived from it, via `java.net.NetworkInterface`.
+> The universal guess - first three octets plus `.255` - is correct on a `/24` and silently wrong on
+> the `/20`, `/22` and `/16` that corporate, campus, guest and mesh networks hand out. Wrong in the
+> worst way: the send succeeds, nothing throws, and the packet reaches nobody.
 >
-> It needs **no runtime permission** - not Location, not `ACCESS_WIFI_STATE` - so the list works on a
-> device where the user denied everything and no SSID can be resolved.
->
-> Two implementations, because one is not enough. `java.net.NetworkInterface` is tried first, but on
-> Android 11+ the `/proc/net` restrictions can make `getNetworkInterfaces()` return **null** - observed
-> on a Samsung running Android 15, where it returns null rather than throwing, and
-> `Collections.list(null)` then dies with an NPE. `ConnectivityManager`/`LinkProperties` is the
-> fallback and gives the prefix length directly. It needs `ACCESS_NETWORK_STATE`, declared in the
-> manifest: a normal permission, granted at install with no prompt.
->
-> This matters because without a netmask there is no way to compute a broadcast address, and the usual
-> workaround - take the first three octets and append `.255` - is only correct on a `/24`. On a `/20`,
-> a host at `10.8.2.76` has its broadcast at `10.8.15.255`, while the shortcut yields `10.8.2.255`: an
-> ordinary unused host address that silently swallows everything sent to it, with no error to go on.
->
-> Cellular is worth a look too. It typically carries a `/32`, where the derived broadcast equals the
-> interface's own address - so any code picking broadcast targets has to exclude it rather than treat
-> it as one more network.
+> Needs no runtime permission. It does **not** defeat client isolation or a separate IoT VLAN - those
+> are routing decisions no app can override. What it fixes is the case where the devices are
+> reachable and the broadcast address was simply pointing at nothing.
+> [The details, with the numbers](#the-netmask-problem-in-detail).
 
 
 ## Related repositories
@@ -42,6 +30,30 @@ the Flutter plugin, so a fix here belongs there too, and vice versa.
 
 Running the native app first is the fastest way to tell a platform bug from a Flutter channel bug: if
 the value is right here and wrong in the plugin, the fault is in the Dart layer.
+
+## The netmask problem in detail
+
+`NetworkInterfaceResolver` lists every IPv4 interface with its **real netmask** and the broadcast
+address derived from it, via `java.net.NetworkInterface`.
+
+It needs **no runtime permission** - not Location, not `ACCESS_WIFI_STATE` - so the list works on a
+device where the user denied everything and no SSID can be resolved.
+
+Two implementations, because one is not enough. `java.net.NetworkInterface` is tried first, but on
+Android 11+ the `/proc/net` restrictions can make `getNetworkInterfaces()` return **null** - observed
+on a Samsung running Android 15, where it returns null rather than throwing, and
+`Collections.list(null)` then dies with an NPE. `ConnectivityManager`/`LinkProperties` is the
+fallback and gives the prefix length directly. It needs `ACCESS_NETWORK_STATE`, declared in the
+manifest: a normal permission, granted at install with no prompt.
+
+This matters because without a netmask there is no way to compute a broadcast address, and the usual
+workaround - take the first three octets and append `.255` - is only correct on a `/24`. On a `/20`,
+a host at `10.8.2.76` has its broadcast at `10.8.15.255`, while the shortcut yields `10.8.2.255`: an
+ordinary unused host address that silently swallows everything sent to it, with no error to go on.
+
+Cellular is worth a look too. It typically carries a `/32`, where the derived broadcast equals the
+interface's own address - so any code picking broadcast targets has to exclude it rather than treat
+it as one more network.
 
 ## Quick Info
 
