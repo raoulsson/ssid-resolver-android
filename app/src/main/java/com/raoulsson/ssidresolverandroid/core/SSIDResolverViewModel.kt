@@ -126,7 +126,10 @@ class SSIDResolverViewModel(
                 @Suppress("UNCHECKED_CAST")
                 return SSIDResolverViewModel(
                     CoreSSIDResolver(context, PermissionHandler(context)),
-                    PermissionHandler(context)
+                    PermissionHandler(context),
+                    // Context lets the resolver fall back to ConnectivityManager
+                    // when NetworkInterface enumeration is blocked by the platform.
+                    NetworkInterfaceResolver(context)
                 ) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")

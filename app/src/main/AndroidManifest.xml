@@ -4,6 +4,12 @@
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- ACCESS_NETWORK_STATE is what ConnectivityManager.getAllNetworks needs.
+         Without it that call throws SecurityException, which matters because
+         NetworkInterface.getNetworkInterfaces() returns null on some Android
+         builds and ConnectivityManager is the only way left to read a netmask.
+         Normal permission - granted at install, no runtime prompt. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
