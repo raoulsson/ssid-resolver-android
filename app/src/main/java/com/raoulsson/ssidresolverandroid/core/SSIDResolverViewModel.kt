@@ -5,13 +5,18 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SSIDResolverViewModel(
     private val coreResolver: CoreSSIDResolver,
-    private val permissionHandler: PermissionHandler
+    private val permissionHandler: PermissionHandler,
+    // Default keeps the existing two-arg Factory call site working unchanged;
+    // this is additive, not a contract change.
+    private val interfaceResolver: NetworkInterfaceResolver = NetworkInterfaceResolver()
 ) : ViewModel() {
 
     private val _ssid = MutableStateFlow("Unresolved SSID")
@@ -31,6 +36,9 @@ class SSIDResolverViewModel(
 
     private val _deniedPermissions = MutableStateFlow<List<String>>(emptyList())
     val deniedPermissions: StateFlow<List<String>> = _deniedPermissions
+
+    private val _interfaces = MutableStateFlow<List<Map<String, Any>>>(emptyList())
+    val interfaces: StateFlow<List<Map<String, Any>>> = _interfaces
 
     init {
         updatePermissionLists()
@@ -98,6 +106,16 @@ class SSIDResolverViewModel(
                 Log.d(TAG, "Set error message to: ${_errorMessage.value}")
             } finally {
                 _isLoading.value = false
+            }
+        }
+    }
+
+    // Needs no permission and no coroutine dispatch trickery here - kept off
+    // the main thread anyway since NetworkInterface enumeration is a syscall.
+    fun fetchInterfaces() {
+        viewModelScope.launch {
+            _interfaces.value = withContext(Dispatchers.IO) {
+                interfaceResolver.fetchInterfaces()
             }
         }
     }
