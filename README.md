@@ -3,7 +3,6 @@
 A standalone app to resolve the SSID of the connected WiFi network in Android, or simply: "Get my Wifi Name". This implementation uses the
 latest Android APIs as of January 2026.
 
-This code was created to be wrapped as a Flutter plugin, which you can find here: https://github.com/raoulsson/ssid_resolver_flutter
 
 > [!IMPORTANT]
 > **Version 2.0 - it can now read the netmask, which Android gives you and most code throws away.**
@@ -30,6 +29,19 @@ This code was created to be wrapped as a Flutter plugin, which you can find here
 > interface's own address - so any code picking broadcast targets has to exclude it rather than treat
 > it as one more network.
 
+
+## Related repositories
+
+This app is the Android source for a three-repo family. The Kotlin in `core` is lifted verbatim into
+the Flutter plugin, so a fix here belongs there too, and vice versa.
+
+| | |
+|---|---|
+| **Flutter plugin** (published) | [ssid_resolver_flutter](https://github.com/raoulsson/ssid_resolver_flutter) - [pub.dev](https://pub.dev/packages/ssid_resolver_flutter) |
+| **iOS counterpart** | [ssid-resolver-ios](https://github.com/raoulsson/ssid-resolver-ios) |
+
+Running the native app first is the fastest way to tell a platform bug from a Flutter channel bug: if
+the value is right here and wrong in the plugin, the fault is in the Dart layer.
 
 ## Quick Info
 
