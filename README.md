@@ -5,6 +5,27 @@ latest Android APIs as of January 2026.
 
 This code was created to be wrapped as a Flutter plugin, which you can find here: https://github.com/raoulsson/ssid_resolver_flutter
 
+> [!IMPORTANT]
+> **Version 2.0 - it can now read the netmask, which Android gives you and most code throws away.**
+>
+> `NetworkInterfaceResolver` lists every IPv4 interface with its **real netmask** and the broadcast
+> address derived from it, via `java.net.NetworkInterface`.
+>
+> It needs **no permission at all** - not Location, not `ACCESS_WIFI_STATE`. That is why it is built on
+> `java.net.NetworkInterface` rather than `WifiManager`/`DhcpInfo`, which needs permissions, covers
+> Wi-Fi only, and is deprecated. The list works on a device where the user has denied everything and
+> the SSID cannot be resolved at all.
+>
+> This matters because without a netmask there is no way to compute a broadcast address, and the usual
+> workaround - take the first three octets and append `.255` - is only correct on a `/24`. On a `/20`,
+> a host at `10.8.2.76` has its broadcast at `10.8.15.255`, while the shortcut yields `10.8.2.255`: an
+> ordinary unused host address that silently swallows everything sent to it, with no error to go on.
+>
+> Cellular is worth a look too. It typically carries a `/32`, where the derived broadcast equals the
+> interface's own address - so any code picking broadcast targets has to exclude it rather than treat
+> it as one more network.
+
+
 ## Quick Info
 
 A short implementation that resolves the SSID of the connected WiFi network in Android.

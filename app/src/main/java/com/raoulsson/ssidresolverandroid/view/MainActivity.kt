@@ -139,35 +139,26 @@ class MainActivity : AppCompatActivity() {
     // verbatim, plus the naive "/24 guess" next to the real broadcast so a
     // non-/24 network shows a visible DIFFER - that difference is the entire
     // reason NetworkInterfaceResolver exists.
-    private fun formatInterfaces(interfaces: List<Map<String, Any>>): String {
+    private fun formatInterfaces(interfaces: List<Map<String, Any>>): CharSequence {
         if (interfaces.isEmpty()) {
             return "No interfaces (tap Refresh)"
         }
+        // States what the OS reports and nothing more. An earlier version put a
+        // naive "/24 guess" beside the real broadcast, which only means anything
+        // to someone who already knows the bug it was built to expose.
         return interfaces.joinToString("\n\n") { iface ->
             val name = iface["name"] as? String ?: "?"
             val ip = iface["ip"] as? String ?: "?"
             val netmask = iface["netmask"] as? String ?: "?"
             val broadcast = iface["broadcast"] as? String ?: "?"
             val prefixLength = iface["prefixLength"]
-            val naiveGuess = naiveBroadcast(ip)
-            val differ = naiveGuess != broadcast
             "$name\n" +
-                "ip: $ip/$prefixLength\n" +
-                "netmask: $netmask\n" +
-                "broadcast (real): $broadcast\n" +
-                "broadcast (/24 guess): $naiveGuess\n" +
-                if (differ) "DIFFER" else "same"
+                "ip        $ip/$prefixLength\n" +
+                "netmask   $netmask\n" +
+                "broadcast $broadcast"
         }
     }
 
-    // Mirrors the naive "first three octets + .255" logic the plugin used
-    // before NetworkInterfaceResolver existed - the buggy behavior this
-    // screen exists to expose, not a real network computation.
-    private fun naiveBroadcast(ip: String): String {
-        val parts = ip.split(".")
-        if (parts.size != 4) return "?"
-        return "${parts[0]}.${parts[1]}.${parts[2]}.255"
-    }
 
     private fun requestPermissions() {
         permissionRequest.launch(
