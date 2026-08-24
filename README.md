@@ -35,7 +35,7 @@ The full permission path on a physical Samsung, left to right, top to bottom.
 |                                                                                                                        |                                                                                                                                    |
 |------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
 | <img src="res/android-1-nothing-granted.jpeg" alt="Nothing granted" width="400"/><br />**1.** Location denied - it names the exact permissions that are missing | <img src="res/android-3-location-prompt.jpeg" alt="Location prompt" width="400"/><br />**2.** The runtime prompt for fine and coarse location |
-| <img src="res/android-4-granted-not-resolved.jpeg" alt="Granted" width="400"/><br />**3.** All permissions granted, ready to resolve | <img src="res/android-5-ssid-resolved.jpeg" alt="SSID resolved" width="400"/><br />**4.** Resolved: `ZH1082Guest` |
+| <img src="res/android-4-granted-not-resolved.jpeg" alt="Granted" width="400"/><br />**3.** All permissions granted, ready to resolve | <img src="res/android-5-ssid-resolved.jpeg" alt="SSID resolved" width="400"/><br />**4.** Resolved: the network name appears |
 | <img src="res/android-6-network-interfaces.jpeg" alt="Network interfaces" width="400"/><br />**5.** Interfaces with real netmasks - no runtime permission needed | |
 
 ## The netmask and the broadcast address
