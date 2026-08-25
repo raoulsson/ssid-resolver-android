@@ -69,7 +69,7 @@ shortcut yields `10.8.2.255`: an ordinary unused host address that swallows ever
 with no error to go on. Screenshot 5 above shows the real thing: `wlan0` on a `/20` with broadcast
 `10.8.15.255`, not `10.8.2.255`.
 
-One honest caveat: this does **not** defeat client isolation or a separate IoT VLAN - those are
+One caveat: this does **not** defeat client isolation or a separate IoT VLAN - those are
 routing decisions no app can override. What it fixes is the case where the devices are reachable
 and the broadcast address was simply pointing at nothing.
 
